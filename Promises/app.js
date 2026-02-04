@@ -44,5 +44,18 @@ const writeFilePro = (file, data) =>
   );
 readFilePro("dog.txt")
   .then((data) => superagent.get(`https://dog.ceo/api/breed/${data}/images/random`))
-  .then((res) => writeFilePro("breed-images.txt", res.body.message))
+  .then((res) => writeFilePro("breed-image.txt", res.body.message))
   .catch((err) => console.log(err.message));
+
+// consuming priomises with async and await
+
+const dogPic = async () => {
+  try {
+    const readFIle = await readFilePro("dog.txt");
+    const data = await superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
+    await writeFilePro("breed-images.txt", data.body.message);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+dogPic();
