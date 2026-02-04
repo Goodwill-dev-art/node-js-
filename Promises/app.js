@@ -42,18 +42,31 @@ const writeFilePro = (file, data) =>
       resolve("the dog breed is save successully");
     }),
   );
-readFilePro("dog.txt")
-  .then((data) => superagent.get(`https://dog.ceo/api/breed/${data}/images/random`))
-  .then((res) => writeFilePro("breed-image.txt", res.body.message))
-  .catch((err) => console.log(err.message));
-
+// nodem
 // consuming priomises with async and await
 
+// const dogPic = async () => {
+//   try {
+//     const readFIle = await readFilePro("dog.txt");
+//     const data = await superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
+//     await writeFilePro("breed-images.txt", data.body.message);
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// };
+// dogPic();
+
+// waiting for multiiple promises simultaneously
 const dogPic = async () => {
   try {
     const readFIle = await readFilePro("dog.txt");
-    const data = await superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
-    await writeFilePro("breed-images.txt", data.body.message);
+    const data1 = superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
+    const data2 = superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
+    const data3 = superagent.get(`https://dog.ceo/api/breed/${readFIle}/images/random`);
+    const all = await Promise.all([data1, data2, data3]);
+
+    const allImages = all.map((data) => data.body.message);
+    await writeFilePro("breed-images.txt", allImages.join("\n"));
   } catch (error) {
     console.log(error.message);
   }
