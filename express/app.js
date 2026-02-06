@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const morgan = require('morgan');
 
-
+// middlewares
 app.use(
   express.json(),
 ); /* this a middleware which is use  to modify the incoming request data  its stand etween in the middle of the request and the response*/
@@ -10,16 +11,19 @@ app.use((req, res, next) => {
   console.log('this is a middleware ,✋🏽✋🏽');
   next();
 });
-app.use((req,res,next)=>{
-    req.requestTime = new Date().toISOString()
-    next()
-})
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+app.use(morgan('dev'));
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'),
 );
+
+// route handlers
 const getAllTour = (req, res) => {
-    console.log(req.requestTime)
+  console.log(req.requestTime);
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestTime,
@@ -98,12 +102,50 @@ const deleteTour = (req, res) => {
 
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
+
+// routes
+
+const getAllUser = (req, res) => {
+  res.status(500).json({
+    message: 'this route is not yet defined',
+  });
+};
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'this route is not yet defined',
+  });
+};
+
 app.route(`/api/v1/tours`).get(getAllTour).post(createTour);
 app
   .route(`/api/v1/tours/:id`)
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+app.route('/api/v1/users').get(getAllUser).post(createUser);
+app.route('/api/v1/user/:id').get(getUser).patch(updateUser).delete(deleteUser);
+//   start the server ;
 const port = 3000;
 app.listen(port, () => {
   console.log(`app running on port ${port}... `);
@@ -128,7 +170,7 @@ app.listen(port, () => {
 // other example are node.js file sysem browser dom js api  we are interesting with the dom api the browser exposes us to in other word api stand as a standlone PIECEOF STANDALONE SPOFTWARE
 
 // THE REST ARCHICTECTURE  WHICH STAND  REPRESENTATION STATE TRANSFER
-// 1 sepearte APi into logical resources  api should be divided into logical resources (ehich are object or represenation of something, which has data associated to it. Any information that can be named can be resource e.g tour user review )  e.g tour
+// 1 sepearte APi into logical resources  api should be divided into logical resources (which are object or represenation of something, which has data associated to it. Any information that can be named can be resource e.g tour user review )  e.g tour
 // 2 expose structured resource -based urls: make availabe the data using some strctured url the client can send request to e.g https://www.natours.com/addNewTour : the addNewTour is called the api end point but the endpoint dont follow the third rule which said that we should only use http method to perform action on data which means that endpoint should contain some resources
 // for example the addNewTour which was suppose to be an endpoint acting as an action but it is suppose we use an http to send a post  equest to add newTour  and use a resources as the url in other word use http metthod as an action
 // 3. use Http method (verbs)
@@ -145,5 +187,7 @@ app.listen(port, () => {
 // when we called the next function the next middleware will be executed with the  exact same request and response object  and that happen with all the middleware until we reach the last one
 
 // creating middleware function
-// the use method is d one use in order to use middleware which in turn create a function added to the middleware 
-// the middleware stack is stopped at a route handler i.e its end whena respnd is send its mist come before the route handler 
+// the use method is d one use in order to use middleware which in turn create a function added to the middleware
+// the middleware stack is stopped at a route handler i.e its end whena respnd is send its mist come before the route handler
+
+// use a third party middle (MORGAN (a login  middleware that will allow us to see request data right in the console))
