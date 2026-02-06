@@ -1,17 +1,28 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'),
-);
+
 
 app.use(
   express.json(),
 ); /* this a middleware which is use  to modify the incoming request data  its stand etween in the middle of the request and the response*/
+app.use((req, res, next) => {
+  console.log('this is a middleware ,✋🏽✋🏽');
+  next();
+});
+app.use((req,res,next)=>{
+    req.requestTime = new Date().toISOString()
+    next()
+})
 
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'),
+);
 const getAllTour = (req, res) => {
+    console.log(req.requestTime)
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     data: {
       tours,
     },
@@ -123,3 +134,16 @@ app.listen(port, () => {
 // 3. use Http method (verbs)
 // 4. send data as JSON (usually)
 // 5 be stateless : state simply refer to a piece of darta in the application that might change over Time for example whether a cetain user is login or on the page which a  list with several pages worth the currentPages that means all state mist be handled by the client  which means each request must contain all the information neccessary  to process certain request
+
+// explaining middleware  and the request response circle
+// our express app receive a request when someone hit the serverfor which it wil then create a request and response object that data will then be use in order to generate and
+// send back a meaniful response in order to process that data  we use a MIDDLEWARE which can manipulate the reuwst and the response object or really execute
+// any other code its usually mostly about the request its called middleware because its a function that is executed between or in the middle of reciving a request and sending a response e. g our route handler, express .json
+// all the middleware that we use in our app is called the middleware stack  .the order of middleware in the stack is defined by the other they are defined in he code so a middleware that appear first in the code is executed before a middleware that appear later
+// our request or response obj that were created in the begining  go through each middleware where they are process or where some other code is executed
+// then at the end of each middleware function a next function is called which is a function that we have access to in each middleware function just like the request and response object
+// when we called the next function the next middleware will be executed with the  exact same request and response object  and that happen with all the middleware until we reach the last one
+
+// creating middleware function
+// the use method is d one use in order to use middleware which in turn create a function added to the middleware 
+// the middleware stack is stopped at a route handler i.e its end whena respnd is send its mist come before the route handler 
