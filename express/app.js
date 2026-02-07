@@ -1,9 +1,10 @@
 const express = require('express');
 const app = express();
-const fs = require('fs');
 const morgan = require('morgan');
+const tourRouter = require('./Routes/tourRoute');
+const userRouter = require('./Routes/userRoute');
 
-// middlewares
+// 1. middlewares
 app.use(
   express.json(),
 ); /* this a middleware which is use  to modify the incoming request data  its stand etween in the middle of the request and the response*/
@@ -17,139 +18,13 @@ app.use((req, res, next) => {
 });
 app.use(morgan('dev'));
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'),
-);
 
-// route handlers
-const getAllTour = (req, res) => {
-  console.log(req.requestTime);
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    data: {
-      tours,
-    },
-  });
-};
-const getTour = (req, res) => {
-  console.log(req.params.id);
-  const id = req.params.id * 1;
-  if (id >= tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      data: 'invalid id',
-    });
-  }
-  const tour = tours.find((tour) => tour.id === id);
-  res.status(202).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-};
-const createTour = (req, res) => {
-  console.log(req.body);
-  console.log(tours[tours.length - 1]);
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    () => {
-      res.status(200).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
-      });
-    },
-  );
-};
-const updateTour = (req, res) => {
-  const id = req.params.id * 1;
-  if (id >= tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      data: 'invalid id',
-    });
-  }
-  res.status(202).json({
-    status: 'success',
-    data: '<Updated tour>',
-  });
-};
-const deleteTour = (req, res) => {
-  const id = req.params.id * 1;
-  if (id >= tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      data: 'invalid id',
-    });
-  }
-  res.status(200).json({
-    status: 'success',
-    data: 'null',
-  });
-};
-// app.get('/api/v1/tours', getAllTour);
+// 3. route
 
-// app.post('/api/v1/tours', createTour);
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-// app.get('/api/v1/tours/:id', getTour);
-
-// app.patch('/api/v1/tours/:id', updateTour);
-// app.delete('/api/v1/tours/:id', deleteTour);
-
-// routes
-
-const getAllUser = (req, res) => {
-  res.status(500).json({
-    message: 'this route is not yet defined',
-  });
-};
-const createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
-
-const getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
-const updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
-
-const deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined',
-  });
-};
-
-app.route(`/api/v1/tours`).get(getAllTour).post(createTour);
-app
-  .route(`/api/v1/tours/:id`)
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-app.route('/api/v1/users').get(getAllUser).post(createUser);
-app.route('/api/v1/user/:id').get(getUser).patch(updateUser).delete(deleteUser);
-//   start the server ;
-const port = 3000;
-app.listen(port, () => {
-  console.log(`app running on port ${port}... `);
-});
+module.exports=app
 
 // express is a minimal nodejs framework , a higher level of abstracton
 // it allows rapid developnent of Node.js  application
@@ -191,3 +66,7 @@ app.listen(port, () => {
 // the middleware stack is stopped at a route handler i.e its end whena respnd is send its mist come before the route handler
 
 // use a third party middle (MORGAN (a login  middleware that will allow us to see request data right in the console))
+
+// creating multiple router and using a process callled mounting
+// by creating a new router and save it to a variable which is incorporated and middleeare e.g
+// const tourROuter = express.Router()
