@@ -1,16 +1,21 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon express/server.js"
+    "start": "nodemon express/server.js",
+    "start:prod": "cross-env NODE_ENV=production nodemon express/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^17.2.4",
     "morgan": "^1.10.1",
     "superagent": "^10.3.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }

@@ -5,6 +5,11 @@ const tourRouter = require('./Routes/tourRoute');
 const userRouter = require('./Routes/userRoute');
 
 // 1. middlewares
+
+if ((process.env.NODE_ENV === 'development')) {
+  app.use(morgan('dev'));
+  console.log("morgan")
+}
 app.use(
   express.json(),
 ); /* this a middleware which is use  to modify the incoming request data  its stand etween in the middle of the request and the response*/
@@ -16,15 +21,13 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-app.use(morgan('dev'));
-
 
 // 3. route
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-module.exports=app
+module.exports = app;
 
 // express is a minimal nodejs framework , a higher level of abstracton
 // it allows rapid developnent of Node.js  application
@@ -70,5 +73,13 @@ module.exports=app
 // creating multiple router and using a process callled mounting
 // by creating a new router and save it to a variable which is incorporated and middleeare e.g
 // const tourROuter = express.Router()
-// params middlware 
-// this is middleware that only run for certain parameter for e.g id 
+// params middlware
+// this is middleware that only run for certain parameter for e.g id
+
+// serving static file with express
+// they are file we cant access using our  route but with  a bilt in express middlweware
+
+// Envirnmental variables
+// Node js or express app can run in different environment and the most inportant one are the development environment and the production environment
+// on the environment we migt use different datases for example or we might turn login ON or OFF or we might turn debbugging on or off depending on the development that we in and the most important is the produstion
+// and the development envirnment  by default express change the environemnt to developement> Hence envirnment variable are global variable that are use to determine the environment in which the node app is running
