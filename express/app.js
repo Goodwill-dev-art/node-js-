@@ -70,3 +70,5 @@ module.exports=app
 // creating multiple router and using a process callled mounting
 // by creating a new router and save it to a variable which is incorporated and middleeare e.g
 // const tourROuter = express.Router()
+// params middlware 
+// this is middleware that only run for certain parameter for e.g id 
