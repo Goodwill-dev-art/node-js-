@@ -1,11 +1,11 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, `a tour must have a name`],
-    unique:true
+    unique: true,
   },
-  rating: {
+  ratingsAverage: {
     type: Number,
     default: 4.5,
   },
@@ -13,10 +13,44 @@ const tourSchema = new mongoose.Schema({
     type: Number,
     required: [true, `a tour must have a price`],
   },
+  duration: {
+    type: Number,
+    required: [true, 'a tour must have a duration'],
+  },
+  maxGroupSize: {
+    type: Number,
+    required: [true, `A tour must have a group size`],
+  },
+  difficulty: {
+    type: String,
+    required: [true],
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
+  },
+  priceDiscount: Number,
+  summary: {
+    type: String,
+    trim :true
+  },
+  description: {
+    type:String,
+    trim:true
+  },
+  imageCover:{
+    type:String,
+    required:[true, `A tour must have a cover image`]
+  },
+  images:[String],
+  createdAt: {
+    type:Date,
+    default: Date.now()
+  },
+  startDates: [Date]
 });
-const Tour=mongoose.model("Tour", tourSchema)
-module.exports=Tour
-
+const Tour = mongoose.model('Tour', tourSchema);
+module.exports = Tour;
 
 // console.log(app.get('env'));
 // console.log(process.env.NODE_ENV + ' it is');
@@ -25,7 +59,7 @@ module.exports=Tour
 
 // const userSchema= new  mongoose.Schema({
 //   name: {
-//     type:String, 
+//     type:String,
 //     required:[true, 'a user must have a name']
 //   },
 //   users: {
@@ -39,7 +73,7 @@ module.exports=Tour
 // const testTour = new Tour({
 //   name: "The forest Hiker",
 //   price: 497,
-//   rating :4.7 
+//   rating :4.7
 // })
 // const testTour2 = new Tour({
 //   name: "The EKo hotel",
@@ -56,7 +90,7 @@ module.exports=Tour
 // testTour.save().then(doc=>{
 //   console.log(doc)
 // }).catch(err=> console.log(`err ${err.message}`))
- 
+
 // testTour2.save().then(doc=> {
 //   console.log(doc)
 // })

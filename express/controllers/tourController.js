@@ -1,4 +1,3 @@
-
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8'),
 // );
@@ -28,12 +27,75 @@ const Tour = require('../model/tourModel');
 //   }
 //   next();
 // };
+module.exports.top5tour = function (req, res, next) {
+  req.query.sort = '-price,ratingsAverage, duration';
+  req.query.fields = `name,duration, price, summary, ratingsAverage`;
+  req.query.limit = 5;
+  next();
+};
+
+class APIfeatures {
+  constructor(query, queryInputData) {
+    this.query = query;
+    this.queryInputData = queryInputData;
+  }
+  filter() {
+    const queryObj = { ...this.queryInputData };
+    const excludedField = ['page', 'sort', 'fields', 'limit', 'skip'];
+    excludedField.forEach((el) => delete queryObj[el]);
+    console.log(queryObj);
+
+    // 1b.  advance filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replaceAll(/\beq|lt|lte|gt|gte\b/g, (op) => `$${op}`);
+
+    this.query = this.query.find(JSON.parse(queryStr));
+    return this;
+  }
+  sort() {
+    if (this.queryInputData.sort) {
+      const sortBy = this.queryInputData.sort.split(',').join(' ');
+
+      this.query = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort('-createdAt');
+    }
+    return this;
+  }
+  // limit fields
+  limitField() {
+    if (this.queryInputData.fields) {
+      const fields = this.queryInputData.fields.split(',').join(' ');
+      console.log(fields);
+      this.query = this.query.select(fields);
+    } else {
+      this.query = this.query.select('-__v');
+    }
+    return this;
+  }
+  pagination() {
+    const limit = this.queryInputData.limit * 1 || 10;
+    const page = this.queryInputData.page * 1 || 1;
+    const skip = (page - 1) * limit;
+    this.query = this.query.skip(skip).limit(limit);
+
+    return this;
+  }
+}
+
 module.exports.getAllTour = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const features = new APIfeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitField()
+      .pagination();
+    const tours = await features.query;
+
     console.log(req.requestTime);
     res.status(200).json({
       status: 'success',
+      result: tours.length,
       requestedAt: req.requestTime,
       data: {
         tours,
@@ -42,7 +104,7 @@ module.exports.getAllTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: error,
+      message: error.message,
     });
   }
 };
@@ -112,3 +174,12 @@ module.exports.deleteTour = async (req, res) => {
     });
   }
 };
+// querying data
+// 1. filtering query object and also exculde specoial field name of some query string like page and sort before we do filtering
+// 2 allowing complex queries  using the greater and the less than opertor
+// 3.  mutliple sort query sort(a b) ese
+// 3  limiting field
+// 4 pagination  (page and limit (the amount of result that we want per page ))
+// Query.skip().limit(19)
+// aggregation pipeline 
+
