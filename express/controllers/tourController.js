@@ -2,7 +2,15 @@
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8'),
 // );
 // from Mongoose model
-const Tour = require('../model/tourModel');
+// querying data
+// 1. filtering query object and also exculde specoial field name of some query string like page and sort before we do filtering
+// 2 allowing complex queries  using the greater and the less than opertor
+// 3.  mutliple sort query sort(a b) ese
+// 3  limiting field
+// 4 pagination  (page and limit (the amount of result that we want per page ))
+// Query.skip().limit(19)
+// aggregation pipeline
+// aggregation pipeline
 
 // 2. route handlers
 // module.exports.checkID = (req, res, next, val) => {
@@ -27,6 +35,7 @@ const Tour = require('../model/tourModel');
 //   }
 //   next();
 // };
+const Tour = require('../model/tourModel');
 module.exports.top5tour = function (req, res, next) {
   req.query.sort = '-price,ratingsAverage, duration';
   req.query.fields = `name,duration, price, summary, ratingsAverage`;
@@ -104,17 +113,20 @@ module.exports.getAllTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: error.message,
+      message: error,
     });
   }
 };
 module.exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
+    console.log(req.params.id+ "dkkddd")
     res.status(202).json({
       status: 'success',
+      result: req.params.id,
       data: {
         tour,
+        
       },
     });
   } catch (error) {
@@ -174,12 +186,7 @@ module.exports.deleteTour = async (req, res) => {
     });
   }
 };
-// querying data
-// 1. filtering query object and also exculde specoial field name of some query string like page and sort before we do filtering
-// 2 allowing complex queries  using the greater and the less than opertor
-// 3.  mutliple sort query sort(a b) ese
-// 3  limiting field
-// 4 pagination  (page and limit (the amount of result that we want per page ))
-// Query.skip().limit(19)
-// aggregation pipeline 
 
+module.exports.getTourStats = async (req, res) => {
+  
+};

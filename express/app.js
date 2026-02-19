@@ -1,8 +1,11 @@
 const express = require('express');
-const app = express();
+
 const morgan = require('morgan');
 const tourRouter = require('./Routes/tourRoute');
 const userRouter = require('./Routes/userRoute');
+
+
+const app = express();
 
 // 1. middlewares
 
