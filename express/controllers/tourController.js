@@ -120,13 +120,12 @@ module.exports.getAllTour = async (req, res) => {
 module.exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
-    console.log(req.params.id+ "dkkddd")
+    console.log(req.params.id + 'dkkddd');
     res.status(202).json({
       status: 'success',
       result: req.params.id,
       data: {
         tour,
-        
       },
     });
   } catch (error) {
@@ -188,5 +187,84 @@ module.exports.deleteTour = async (req, res) => {
 };
 
 module.exports.getTourStats = async (req, res) => {
-  
+  try {
+    const stat = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: '$difficulty',
+          avgPrice: { $avg: '$price' },
+          numTours: { $sum: 1 },
+          maxPrice: { $max: '$price' },
+          minPrice: { $min: '$price' },
+          numRating: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+        },
+      },
+      {
+        $sort: { avgPrice: -1 },
+      },
+      {
+        $match: { _id: { $ne: 'easy' } },
+      },
+    ]);
+    res.status(202).json({
+      status: 'success',
+      data: {
+        stat,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
+};
+// calculating the busiet month
+module.exports.getMonthlyPlan = async (req, res) => {
+  try {
+    // console.log(req.params.year)
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTourStat: { $sum: 1 },
+          tour: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: { month: '$_id' },
+      },
+      {
+        $project: { _id: 0 },
+      },
+    ]);
+    res.status(202).json({
+      status: 'success',
+      results: plan.length,
+      data: {
+        plan,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error.message,
+    });
+  }
 };
